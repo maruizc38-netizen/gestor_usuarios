@@ -27,11 +27,33 @@ def login_form():
         session['usuario'] = user[1]
         session['rol'] = user[3]
 
-        return redirect(url_for("inicio"))
+        if session['rol'] == 'empleado':
+            return redirect(url_for("panelempleado"))
+        elif session['rol'] == 'administrador':
+            return redirect(url_for("inicio"))
     else:
-        flash("Usuario y contraseña incorrectos", "danger")
+        return redirect(url_for("login"))
+
+@apps.route('/panelempleado')
+def panelempleado():
+    if 'usuario' not in session:
         return redirect(url_for('login'))
 
+    con = conectar()
+    cursor = con.cursor()
+
+    cursor.execute("""
+        SELECT e.*, d.nombre_area 
+        FROM empleados e
+        INNER JOIN departamentos d 
+        ON e.id_area = d.id_area
+    """)
+    lista_empleados = cursor.fetchall()
+
+    cursor.close()
+    con.close()
+
+    return render_template("panelempleado.html", empleados=lista_empleados)
 # INICIO
 
 @apps.route('/inicio')
@@ -310,6 +332,9 @@ def actualizar_empleado():
 
     flash("Empleado actualizado correctamente", "success")
     return redirect(url_for('inicio'))
+
+#   EMPLEADOS 
+
 
 #  SALIR
 
