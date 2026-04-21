@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 4.8.0.1
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 26-03-2026 a las 23:17:08
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Tiempo de generación: 13-04-2026 a las 20:17:22
+-- Versión del servidor: 10.1.32-MariaDB
+-- Versión de PHP: 7.2.5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -29,19 +30,18 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `departamentos` (
   `id_area` int(11) NOT NULL,
-  `nombre_area` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `nombre_area` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `departamentos`
 --
 
 INSERT INTO `departamentos` (`id_area`, `nombre_area`) VALUES
-(1, 'Recursos Humanos'),
-(3, 'Administracion'),
-(4, 'Contabilidad'),
-(5, 'Coordinacion'),
-(6, 'Red de medios');
+(1, 'administracion '),
+(2, 'cafeteria'),
+(3, 'recursos humanos'),
+(4, 'red de medios ');
 
 -- --------------------------------------------------------
 
@@ -50,28 +50,29 @@ INSERT INTO `departamentos` (`id_area`, `nombre_area`) VALUES
 --
 
 CREATE TABLE `empleados` (
-  `id` int(11) NOT NULL,
-  `documentoEmple` varchar(50) NOT NULL,
-  `nombreEmple` varchar(50) NOT NULL,
-  `apellidoEmple` varchar(50) NOT NULL,
-  `cargo` varchar(50) NOT NULL,
-  `salarioB` decimal(10,2) NOT NULL,
-  `horasExtras` int(11) DEFAULT NULL,
+  `id_empleado` int(11) NOT NULL,
+  `documento` int(11) DEFAULT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `apellido` varchar(100) NOT NULL,
+  `cargo` varchar(100) NOT NULL,
+  `salario` decimal(10,2) DEFAULT NULL,
+  `horas_extras` int(11) DEFAULT NULL,
   `bonificacion` decimal(10,2) DEFAULT NULL,
   `salud` decimal(10,2) DEFAULT NULL,
   `pension` decimal(10,2) DEFAULT NULL,
   `salario_neto` decimal(10,2) DEFAULT NULL,
-  `id_dep` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id_area` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `empleados`
 --
 
-INSERT INTO `empleados` (`id`, `documentoEmple`, `nombreEmple`, `apellidoEmple`, `cargo`, `salarioB`, `horasExtras`, `bonificacion`, `salud`, `pension`, `salario_neto`, `id_dep`) VALUES
-(1, '5555', 'Santiago', 'Andrade', 'gerente', 6740000.00, 20, 1500000.00, 269600.00, 269600.00, 6200800.00, 3),
-(2, '1478', 'Leydy', 'Diaz', 'administrador', 3848000.00, 56, 180000.00, 153920.00, 153920.00, 3540160.00, 3),
-(3, '5454', 'Karen', 'Prieto', 'gerente', 5705000.00, 85, 450000.00, 228200.00, 228200.00, 5248600.00, 6);
+INSERT INTO `empleados` (`id_empleado`, `documento`, `nombre`, `apellido`, `cargo`, `salario`, `horas_extras`, `bonificacion`, `salud`, `pension`, `salario_neto`, `id_area`) VALUES
+(5, 1029144678, 'miguel ', 'ruiz', 'empleado', '5100000.00', 0, '100000.00', '204000.00', '204000.00', '4692000.00', NULL),
+(6, 79626539, 'jose', 'ruiz', 'gerente', '5230000.00', 20, '100000.00', '209200.00', '209200.00', '5565350.00', 1),
+(10, 2525, 'pepe', 'perez', 'programador ', '4000000.00', 10, '100000.00', '160000.00', '160000.00', '4030000.00', 4),
+(11, 2188, 'sara ', 'culma', 'analista', '2600000.00', 10, '100000.00', '104000.00', '104000.00', '2654500.00', 2);
 
 -- --------------------------------------------------------
 
@@ -81,20 +82,20 @@ INSERT INTO `empleados` (`id`, `documentoEmple`, `nombreEmple`, `apellidoEmple`,
 
 CREATE TABLE `usuarios` (
   `id_usuario` int(11) NOT NULL,
-  `usuario` varchar(50) NOT NULL,
-  `PASSWORD` varchar(255) NOT NULL,
+  `usuario` varchar(100) NOT NULL,
+  `PASSWORD` varchar(100) NOT NULL,
   `rol` varchar(20) NOT NULL,
-  `documentoEmple` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `documento` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id_usuario`, `usuario`, `PASSWORD`, `rol`, `documentoEmple`) VALUES
-(1, 'Sara', '246810', 'empleado', '5555'),
+INSERT INTO `usuarios` (`id_usuario`, `usuario`, `PASSWORD`, `rol`, `documento`) VALUES
 (2, 'admin', '123456', 'administrador', NULL),
-(6, 'Leydy', '78910', 'empleado', '5555');
+(5, 'MIGUEL15', '1505', 'administrador', 79626539),
+(6, 'pepeperez', '2828', 'empleado', 2525);
 
 --
 -- Índices para tablas volcadas
@@ -110,16 +111,16 @@ ALTER TABLE `departamentos`
 -- Indices de la tabla `empleados`
 --
 ALTER TABLE `empleados`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `documentoEmple` (`documentoEmple`),
-  ADD KEY `id_dep` (`id_dep`);
+  ADD PRIMARY KEY (`id_empleado`),
+  ADD UNIQUE KEY `documento` (`documento`),
+  ADD KEY `id_area` (`id_area`);
 
 --
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id_usuario`),
-  ADD KEY `documentoEmple` (`documentoEmple`);
+  ADD UNIQUE KEY `documento` (`documento`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -129,13 +130,13 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `departamentos`
 --
 ALTER TABLE `departamentos`
-  MODIFY `id_area` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_area` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `empleados`
 --
 ALTER TABLE `empleados`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_empleado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
@@ -151,13 +152,13 @@ ALTER TABLE `usuarios`
 -- Filtros para la tabla `empleados`
 --
 ALTER TABLE `empleados`
-  ADD CONSTRAINT `empleados_ibfk_1` FOREIGN KEY (`id_dep`) REFERENCES `departamentos` (`id_area`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `empleados_ibfk_1` FOREIGN KEY (`id_area`) REFERENCES `departamentos` (`id_area`) ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  ADD CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`documentoEmple`) REFERENCES `empleados` (`documentoEmple`);
+  ADD CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`documento`) REFERENCES `empleados` (`documento`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
