@@ -41,16 +41,32 @@
                         <th>Cargo</th>
                         <th>Salario</th>
                         <th>Horas extras</th>
-                        
-                        
+                        <th>bonificacion</th>
+                        <th>salud</th>
+                        <th>pension</th>
+                        <th>salario neto</th>
+
+
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- FILAS DE LA TABLA -->
+                    <tr>
+                        <td>{{ empleados.documento }}</td>
+                        <td>{{ empleados.nombre }}</td>
+                        <td>{{ empleados.apellido }}</td>
+                        <td>{{ empleados.cargo }}</td>
+                        <td>{{ empleados.salario }}</td>
+                        <td>{{ empleados.horas_extras }}</td>
+                        <td>{{ empleados.bonificacion }}</td>
+                        <td>{{ empleados.salud }}</td>
+                        <td>{{ empleados.pension }}</td>
+                        <td>{{ empleados.salario_neto }}</td>
+                    </tr>
                 </tbody>
             </table>
             <!-- BOTONES -->
             <div class="text-center mb-3">
+                <a href="{{ url_for('editar_emp') }}" class="btn btn-warning btn-sm">Editar</a>
                 <!-- CERRAR SESION -->
                 <a href="{{url_for('salir')}}" class="btn btn-danger m-2">
                     Cerrar Sesión
@@ -59,4 +75,5 @@
         </div>
     </div>
 </body>
+
 </html>

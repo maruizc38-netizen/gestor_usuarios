@@ -24,7 +24,7 @@ def login_form():
     user = cursor.fetchone()
 
     if user:
-        session['usuario'] = user[1]
+        session['usuario'] = user[4]  # suponiendo que aquí está el documento
         session['rol'] = user[3]
 
         if session['rol'] == 'empleado':
@@ -40,20 +40,81 @@ def panelempleado():
         return redirect(url_for('login'))
 
     con = conectar()
+    cursor = con.cursor(dictionary=True)
+#de la tabla empleados se trae el nombre el apellido y el cargo, salario, horas extras, bonificacion, salud, pension, salario neto y el nombre del area a la que pertenece el empleado con una consulta sql usando el inner join para relacionar el documento del empleado con el documento del usuario y el id_area del empleado con el id_area del departamento, filtrando por el documento del usuario que ha iniciado sesión
+    cursor.execute("""
+        SELECT e.documento, e.nombre, e.apellido, e.cargo, e.salario, e.horas_extras, e.bonificacion, e.salud, e.pension, e.salario_neto, d.nombre_area
+        FROM empleados e
+        INNER JOIN departamentos d ON e.id_area = d.id_area
+        WHERE e.documento = %s
+    """, (session['usuario'],))
+    datos_empleados = cursor.fetchone()
+
+    cursor.close()
+    con.close()
+    print("SESSION:", session['usuario'])
+    print("DATOS:", datos_empleados)
+
+    return render_template("panelempleado.html", empleados=datos_empleados)
+#                       actualizar_empleado
+    
+@apps.route('/actualizar_empleado', methods=['POST'])
+def actualizar_emp():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    nombre = request.form['nombre']
+    apellido = request.form['apellido']
+    cargo = request.form['cargo']
+    id_area = request.form['id_area']
+
+    # VALIDACIONES
+    if not nombre or not apellido or not cargo:
+        flash("Todos los campos son obligatorios", "danger")
+        return redirect(url_for('editar_empleado'))
+
+    con = conectar()
     cursor = con.cursor()
+
+    cursor.execute("""
+        UPDATE empleados
+        SET nombre=%s, apellido=%s, cargo=%s, id_area=%s
+        WHERE documento=%s
+    """, (nombre, apellido, cargo, id_area, session['usuario']))
+
+    con.commit()
+    cursor.close()
+    con.close()
+
+    flash("Datos actualizados correctamente", "success")
+    return redirect(url_for('panelempleado'))
+
+
+#editar empleado
+@apps.route('/editar_empleado')
+def editar_emp():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    con = conectar()
+    cursor = con.cursor(dictionary=True)
 
     cursor.execute("""
         SELECT e.*, d.nombre_area 
         FROM empleados e
-        INNER JOIN departamentos d 
-        ON e.id_area = d.id_area
-    """)
-    lista_empleados = cursor.fetchall()
+        INNER JOIN departamentos d ON e.id_area = d.id_area
+        WHERE e.documento = %s
+    """, (session['usuario'],))
+
+    empleado = cursor.fetchone()
+
+    cursor.execute("SELECT * FROM departamentos")
+    departamentos = cursor.fetchall()
 
     cursor.close()
     con.close()
 
-    return render_template("panelempleado.html", empleados=lista_empleados)
+    return render_template("editar_emp.html", empleado=empleado, departamentos=departamentos)
 # INICIO
 
 @apps.route('/inicio')
@@ -69,11 +130,7 @@ def inicio():
     lista_usuarios = cursor.fetchall()
 
     cursor.execute("""
-        SELECT e.*, d.nombre_area 
-        FROM empleados e
-        INNER JOIN departamentos d 
-        ON e.id_area = d.id_area
-    """)
+        SELECT e.*, d.nombre_area FROM empleados e INNER JOIN departamentos d ON e.id_area = d.id_area""")
     lista_empleados = cursor.fetchall()
 
     cursor.execute("SELECT * FROM departamentos")
